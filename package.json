@@ -8,7 +8,13 @@
     "test:all": "nve 4,6,8,10,12,14,15 node test.js",
     "lint": "eslint *.js"
   },
-  "keywords": [],
+  "repository": "hildjj/ctoaf-textdecoder",
+  "keywords": [
+    "TextDecoder",
+    "utf8",
+    "utf-8",
+    "polyfill"
+  ],
   "author": "Joe Hildebrand <joe-github@cursive.net>",
   "license": "MIT",
   "devDependencies": {
