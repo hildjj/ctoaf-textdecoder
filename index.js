@@ -1,5 +1,9 @@
 'use strict'
 
+function add(t, v) {
+  return t + v
+}
+
 let TD = null
 // Note: using globalThis is WAY more complicated than is needed.
 if (typeof TextDecoder === 'function') {
@@ -8,22 +12,29 @@ if (typeof TextDecoder === 'function') {
 } else if (typeof window !== 'undefined') {
   // eslint-disable-next-line no-undef
   TD = window.TextDecoder
-} else if (typeof self !== 'undefined') {
-  // eslint-disable-next-line no-undef
-  TD = self.TextDecoder
-} else {
+} else if (typeof self === 'undefined') {
   try {
-    // Node 8.3 - 10
-    const util = require('util')
+    if (process &&
+        process.versions &&
+        process.versions.node &&
+        process.versions.node.match(/^(?:8|10)\./) &&
+        (typeof TD !== 'function')) {
+      // Let's see if we can fake out the metro bundler.
+      // The goal is to *not* try to inline the util package here.
+      const rq = require
+      const u = ['u', 't', 'i', 'l'].reduce(add, '')
 
-    /* istanbul ignore next */
-    if (typeof TD !== 'function') {
-      // node 10
+      // Node 8.3 - 10
+      // eslint-disable-next-line no-useless-call
+      const util = rq.call(null, u)
       TD = util.TextDecoder
     }
   } catch (ignored) {
-    // util couldn't be loaded.  Probably an old browser.
+    // Module util couldn't be loaded.  Probably an old browser.
   }
+} else {
+  // eslint-disable-next-line no-undef
+  TD = self.TextDecoder
 }
 
 if (typeof TD !== 'function') {
@@ -34,7 +45,7 @@ if (typeof TD !== 'function') {
     }
 
     decode(buf) {
-      // this isn't very good, but people should use more modern things
+      // This isn't very good, but people should use more modern things
       // so they don't need it.
       const str = buf.toString(this.utfLabel)
       if (this.options.fatal) {
