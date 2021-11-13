@@ -17,20 +17,20 @@ class TextDecoderPolyfill {
     // This isn't very good, but people should use more modern things
     // so they don't need it.
     const stream = Boolean(options && options.stream)
+
     if (stream && this.buffer) {
       buf = Buffer.concat([this.buffer, buf])
       this.buffer = null
     }
     let str = buf.toString(this.utfLabel)
     if (stream) {
-      if (str.codePointAt(str.length - 1) === 0xFFFD) {
-        // Truncated character at the end
-        str = str.slice(0, -1)
-        let start = buf.length - 1
-        while ((start >= 0) && (buf[start] & 0x80)) {
-          start--
-        }
-        this.buffer = buf.slice(start + 1)
+      // Frustratingly, node 4 and 6 put in a replacement character
+      // for each byte of a truncated codepoint.
+      let start = buf.length - 1
+      while (str.codePointAt(str.length - 1) === 0xFFFD) {
+        this.buffer = buf.slice(start)
+        str = buf.slice(0, start).toString(this.utfLabel)
+        start--
       }
     }
     if (this.fatal) {

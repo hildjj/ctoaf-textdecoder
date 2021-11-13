@@ -16,9 +16,15 @@ function test(TD) {
   assert.equal(td2.decode(Buffer.from('AC', 'hex'), {stream: true}), '€')
   assert.equal(td2.decode(Buffer.from('666F6FE2', 'hex'), {stream: true}), 'foo')
   assert.equal(td2.decode(Buffer.from('82AC', 'hex'), {stream: true}), '€')
-  assert.equal(td2.decode(Buffer.from('666F6FE2', 'hex'), {stream: true}), 'foo')
+  assert.equal(td2.decode(Buffer.from('666F6FE282ACE2', 'hex'), {stream: true}), 'foo€')
   assert.equal(td2.decode(Buffer.from('82', 'hex'), {stream: true}), '')
   assert.equal(td2.decode(Buffer.from('AC', 'hex'), {stream: true}), '€')
+
+  // This should throw, but we can't detect trailing invalid encoding in
+  // stream mode. See: https://github.com/hildjj/ctoaf-textdecoder/issues/4
+  // assert.throws(
+  //   () => td2.decode(Buffer.from('E1A0C0', 'hex'), {stream: true})
+  // )
 
   const td3 = new TD()
   assert.equal(td3.decode(Buffer.from('EFBBBFE282AC', 'hex')), '€')
