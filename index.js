@@ -4,61 +4,6 @@ function add(t, v) {
   return t + v
 }
 
-class TextDecoderPolyfill {
-  constructor(utfLabel, options) {
-    this.utfLabel = utfLabel || 'utf-8'
-    options = options || {}
-    this.fatal = Boolean(options.fatal)
-    this.ignoreBOM = Boolean(options.ignoreBOM)
-    this.buffer = null
-  }
-
-  decode(buf, options) {
-    // This isn't very good, but people should use more modern things
-    // so they don't need it.
-    const stream = Boolean(options && options.stream)
-
-    if (stream && this.buffer) {
-      buf = Buffer.concat([this.buffer, buf])
-      this.buffer = null
-    }
-    let str = buf.toString(this.utfLabel)
-    if (stream) {
-      // Frustratingly, node 4 and 6 put in a replacement character
-      // for each byte of a truncated codepoint.
-      let start = buf.length - 1
-      while (str.codePointAt(str.length - 1) === 0xFFFD) {
-        this.buffer = buf.slice(start)
-        str = buf.slice(0, start).toString(this.utfLabel)
-        start--
-      }
-    }
-    if (this.fatal) {
-      for (const c of str) {
-        // The default Buffer.prototype.toString() implementation uses
-        // U+FFFD: REPLACEMENT CHARACTER
-        // for any bad UTF encoding.
-        if (c.codePointAt(0) === 0xFFFD) {
-          const err = new TypeError(
-            '[ERR_ENCODING_INVALID_ENCODED_DATA]: ' +
-            'The encoded data was not valid for encoding ' + this.utfLabel
-          )
-          err.code = 'ERR_ENCODING_INVALID_ENCODED_DATA'
-          err.errno = 12
-          throw err
-        }
-      }
-    }
-    if (!this.ignoreBOM) {
-      // U+FEFF: BYTE ORDER MARK
-      if (str.codePointAt(0) === 0xFEFF) {
-        return str.slice(1)
-      }
-    }
-    return str
-  }
-}
-
 const hasICU = (typeof Intl === 'object')
 let TD = null
 
@@ -99,11 +44,7 @@ if (hasICU) {
 }
 
 if (typeof TD !== 'function') {
-  TD = TextDecoderPolyfill
+  TD = require('./polyfill.js')
 }
 
-// Make polyfill testable on late-enough node versions
-if ((typeof Symbol === 'function') && (typeof Symbol.for === 'function')) {
-  TD[Symbol.for('@cto.af/textdecoder/polyfill')] = TextDecoderPolyfill
-}
 module.exports = TD
