@@ -6,7 +6,7 @@
   "scripts": {
     "test": "node test.js",
     "test:all": "nve 4,6,8,10,12,14,16,17 node test.js",
-    "lint": "eslint . --ext js"
+    "lint": "eslint ."
   },
   "repository": "hildjj/ctoaf-textdecoder",
   "keywords": [
