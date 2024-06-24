@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 module.exports = {
   root: true,
@@ -10,4 +10,4 @@ module.exports = {
     'node/prefer-global/buffer': 'off',
     'prefer-arrow-callback': 'off',
   },
-}
+};
