@@ -25,3 +25,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Test
         run: npm run test
+      - name: Check coding standards
+        if: matrix.node-version == '22.x'
+        run: npm run lint
