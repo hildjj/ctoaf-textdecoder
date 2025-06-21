@@ -1,7 +1,9 @@
+import ignores from '@cto.af/eslint-config/ignores.js';
 import js from '@cto.af/eslint-config/js.js';
 import mjs from '@cto.af/eslint-config/mjs.js';
 
 export default [
+  ...ignores,
   ...js,
   ...mjs,
   {
