@@ -12,6 +12,7 @@ export default [
     ],
     rules: {
       'n/prefer-global/buffer': 'off',
+      'n/prefer-node-protocol': 'off',
       'prefer-arrow-callback': 'off',
       'prefer-destructuring': 'off',
       'prefer-template': 'off',

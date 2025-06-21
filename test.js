@@ -1,8 +1,6 @@
 'use strict';
 
-// Only tested on later versions
-// eslint-disable-next-line n/no-unsupported-features/node-builtins
-const assert = require('node:assert');
+const assert = require('assert');
 const TxtD = require('./');
 const Polyfill = require('./polyfill.js');
 
