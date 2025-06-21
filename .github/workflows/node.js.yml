@@ -24,7 +24,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: pnpm
+          # Don't cache, since we're running on such old
+          # node versions.
+          # cache: pnpm
       - name: Test
         run: npm run test
       - name: Check coding standards
