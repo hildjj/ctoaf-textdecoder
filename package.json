@@ -18,22 +18,14 @@
   "author": "Joe Hildebrand <joe-github@cursive.net>",
   "license": "MIT",
   "devDependencies": {
-    "@cto.af/eslint-config": "^4.0.2",
-    "eslint": "^9.5.0",
+    "@cto.af/eslint-config": "^6.0.9",
+    "eslint": "^9.29.0",
     "eslint-plugin-ava": "^15.0.1",
-    "eslint-plugin-jsdoc": "^48.4.0",
+    "eslint-plugin-jsdoc": "^51.1.1",
     "eslint-plugin-node": "^11.1.0"
   },
-  "overrides": {
-    "@typescript-eslint/utils": "8.0.0-alpha.30"
-  },
-  "pnpm": {
-    "overrides": {
-      "@typescript-eslint/utils": "8.0.0-alpha.30"
-    }
-  },
-  "packageManager": "pnpm@9.4.0",
+  "packageManager": "pnpm@10.12.1",
   "engines": {
-    "node": ">=4.9.1"
+    "node": ">=5.10.0"
   }
 }
