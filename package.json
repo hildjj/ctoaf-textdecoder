@@ -1,6 +1,6 @@
 {
   "name": "@cto.af/textdecoder",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Quick wrapper that finds TextDecoder or polyfills a bad implementation",
   "main": "index.js",
   "scripts": {
