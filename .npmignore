@@ -8,3 +8,4 @@ coverage/
 eslint.config.mjs
 node_modules/
 test.js
+.c8rc

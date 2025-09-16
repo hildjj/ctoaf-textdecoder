@@ -4,14 +4,26 @@ const assert = require('assert');
 const TxtD = require('./');
 const Polyfill = require('./polyfill.js');
 
+const invalid = [
+  'E1A0C0',
+  '61FF61',
+  '61AC',
+  'EF61',
+  'E2E282AC',
+  'F8',
+  'FF',
+];
+
 function test(TD) {
   assert.throws(() => new TD('foo'));
 
   const td = new TD('utf8', {fatal: true, ignoreBOM: true});
   assert.equal(td.decode(Buffer.from('E282AC', 'hex')), '€');
   assert.equal(td.decode(Buffer.from('EFBBBFE282AC', 'hex')), '\ufeff€');
-  assert.throws(() => td.decode(Buffer.from('E1A0C0', 'hex')));
   assert.throws(() => td.decode('foo'));
+  for (const inv of invalid) {
+    assert.throws(() => td.decode(Buffer.from(inv, 'hex')), inv);
+  }
 
   const buf = Buffer.from('FFFFE282AC61FFFF', 'hex');
   // Slice uses begin/end, not length.
@@ -31,9 +43,10 @@ function test(TD) {
   assert.equal(td2.decode(Buffer.from('82', 'hex'), {stream: true}), '');
   assert.equal(td2.decode(Buffer.from('AC', 'hex'), {stream: true}), '€');
 
-  assert.throws(
-    () => td2.decode(Buffer.from('E1A0C0', 'hex'), {stream: true})
-  );
+  for (const inv of invalid) {
+    assert.throws(() => td2.decode(Buffer.from(inv, 'hex'), {stream: true}), inv);
+  }
+
   assert.throws(() => td2.decode(Buffer.from('FF', 'hex')));
   assert.throws(() => td2.decode(Buffer.from('AC', 'hex')));
   assert.throws(() => td2.decode(Buffer.from('EF61', 'hex')));
@@ -47,6 +60,10 @@ function test(TD) {
   assert.equal(td3.decode(Buffer.from('E2E282AC', 'hex')), '\ufffd€');
   assert.equal(td3.decode(Buffer.from('E282', 'hex')), '\ufffd');
   assert.equal(td3.decode(ab), '\ufffd\ufffd€a\ufffd\ufffd');
+
+  for (const inv of invalid) {
+    assert.doesNotThrow(() => td3.decode(Buffer.from(inv, 'hex')), inv);
+  }
 }
 
 // Test the selected version.  Uninteresting if we're using the native

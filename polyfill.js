@@ -1,51 +1,51 @@
 'use strict';
 
 const REPLACEMENT = '\ufffd';
-const BYTES = {
+const BYTES = [
   // 0b00_000 - 0b01_111: ASCII
-  0: 0,
-  1: 0,
-  2: 0,
-  3: 0,
-  4: 0,
-  5: 0,
-  6: 0,
-  7: 0,
-  8: 0,
-  9: 0,
-  10: 0,
-  11: 0,
-  12: 0,
-  13: 0,
-  14: 0,
-  15: 0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
 
   // 0b10_000 - 0b10_111: Continuation
-  16: -1,
-  17: -1,
-  18: -1,
-  19: -1,
-  20: -1,
-  21: -1,
-  22: -1,
-  23: -1,
+  -1,
+  -1,
+  -1,
+  -1,
+  -1,
+  -1,
+  -1,
+  -1,
 
   // 0b110_00 - 0b110_11: Two bytes
-  24: 1,
-  25: 1,
-  26: 1,
-  27: 1,
+  1,
+  1,
+  1,
+  1,
 
   // 0b1110_0 - 0b1110_1: Three bytes
-  28: 2,
-  29: 2,
+  2,
+  2,
 
   // 0b11110: Four bytes
-  30: 3,
+  3,
 
   // 0b11111: Invalid
-  31: -2,
-};
+  -2,
+];
 
 const ERR_MSG = '[ERR_ENCODING_INVALID_ENCODED_DATA]: ' +
 'The encoded data was not valid for encoding utf-8';
@@ -56,7 +56,7 @@ function utf8Decode(buf, fatal, state) {
   }
   let res = '';
   for (const b of buf) {
-    const bytes = BYTES[(b & 0xf8) >> 3];
+    const bytes = BYTES[b >> 3];
     switch (bytes) {
       case -2:
         // Top 5 bits all set
