@@ -1,6 +1,6 @@
 {
   "name": "@cto.af/textdecoder",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Quick wrapper that finds TextDecoder in your runtime, or uses an adequate polyfill",
   "main": "index.js",
   "scripts": {
