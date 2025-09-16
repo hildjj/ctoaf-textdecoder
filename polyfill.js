@@ -21,7 +21,7 @@ const BYTES = [
   0,
 
   // 0b10_000 - 0b10_111: Continuation
-  -1,
+  -1, // 16
   -1,
   -1,
   -1,
@@ -31,28 +31,48 @@ const BYTES = [
   -1,
 
   // 0b110_00 - 0b110_11: Two bytes
-  1,
+  1, // 24
   1,
   1,
   1,
 
   // 0b1110_0 - 0b1110_1: Three bytes
-  2,
+  2, // 28
   2,
 
   // 0b11110: Four bytes
-  3,
+  3, // 30
 
   // 0b11111: Invalid
-  -2,
+  -2, // 31
 ];
 
 const ERR_MSG = '[ERR_ENCODING_INVALID_ENCODED_DATA]: ' +
 'The encoded data was not valid for encoding utf-8';
 
+function badLength(state) {
+  if (state.cur < 0x80) {
+    return true;
+  }
+  if (state.cur < 0x800) {
+    if (state.total !== 1) {
+      return true;
+    }
+  } else if (state.cur < 0x010000) {
+    if (state.total !== 2) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function surrogate(state) {
+  return (state.cur >= 0xd800) && (state.cur <= 0xdfff);
+}
+
 function utf8Decode(buf, fatal, state) {
   if (!state) {
-    state = {cur: 0, left: 0};
+    state = {cur: 0, left: 0, total: 0};
   }
   let res = '';
   for (const b of buf) {
@@ -62,6 +82,7 @@ function utf8Decode(buf, fatal, state) {
         // Top 5 bits all set
         state.cur = 0;
         state.left = 0;
+        state.total = 0;
         if (fatal) {
           const err = new TypeError(ERR_MSG);
           err.code = 'ERR_ENCODING_INVALID_ENCODED_DATA';
@@ -77,6 +98,7 @@ function utf8Decode(buf, fatal, state) {
           // Too many continuation bytes
           state.cur = 0;
           state.left = 0;
+          state.total = 0;
           if (fatal) {
             const err = new TypeError(ERR_MSG);
             err.code = 'ERR_ENCODING_INVALID_ENCODED_DATA';
@@ -88,8 +110,19 @@ function utf8Decode(buf, fatal, state) {
         } else {
           state.cur = (state.cur << 6) | (b & 0x3f);
           if (state.left === 0) {
-            res += String.fromCodePoint(state.cur);
-            state.cur = 0;
+            if (badLength(state) || surrogate(state)) {
+              if (fatal) {
+                const err = new TypeError(ERR_MSG);
+                err.errno = 12;
+                err.code = 'ERR_ENCODING_INVALID_ENCODED_DATA';
+                throw err;
+              } else {
+                res += REPLACEMENT;
+              }
+            } else {
+              res += String.fromCodePoint(state.cur);
+              state.cur = 0;
+            }
           }
         }
         break;
@@ -98,6 +131,7 @@ function utf8Decode(buf, fatal, state) {
           // Not enough continuation bytes
           state.cur = 0;
           state.left = 0;
+          state.total = 0;
           if (fatal) {
             const err = new TypeError(ERR_MSG);
             err.code = 'ERR_ENCODING_INVALID_ENCODED_DATA';
@@ -114,6 +148,7 @@ function utf8Decode(buf, fatal, state) {
           // Not enough continuation bytes
           state.cur = 0;
           state.left = 0;
+          state.total = 0;
           if (fatal) {
             const err = new TypeError(ERR_MSG);
             err.code = 'ERR_ENCODING_INVALID_ENCODED_DATA';
@@ -123,6 +158,7 @@ function utf8Decode(buf, fatal, state) {
             res += REPLACEMENT;
           }
         }
+        state.total = bytes;
         state.left = bytes;
         state.cur = b & (0xff >> (bytes + 2));
         break;
@@ -133,8 +169,8 @@ function utf8Decode(buf, fatal, state) {
 
 class TextDecoderPolyfill {
   constructor(utfLabel, options) {
-    this.utfLabel = (utfLabel || 'utf-8').toLowerCase();
-    if ((this.utfLabel !== 'utf-8') && (this.utfLabel !== 'utf8')) {
+    this.encoding = (utfLabel || 'utf-8').toLowerCase();
+    if ((this.encoding !== 'utf-8') && (this.encoding !== 'utf8')) {
       const err = new RangeError('The "' + utfLabel + '" encoding is not supported');
       err.code = 'ERR_ENCODING_NOT_SUPPORTED';
       throw err;
@@ -142,7 +178,12 @@ class TextDecoderPolyfill {
     options = options || {};
     this.fatal = Boolean(options.fatal);
     this.ignoreBOM = Boolean(options.ignoreBOM);
-    this.state = null;
+    Object.defineProperty(this, 'state', {
+      value: null,
+      configurable: false,
+      enumerable: false,
+      writable: true,
+    });
   }
 
   decode(input, options) {

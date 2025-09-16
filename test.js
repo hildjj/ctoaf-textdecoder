@@ -5,13 +5,29 @@ const TxtD = require('./');
 const Polyfill = require('./polyfill.js');
 
 const invalid = [
-  'E1A0C0',
-  '61FF61',
-  '61AC',
-  'EF61',
-  'E2E282AC',
-  'F8',
-  'FF',
+  'E1A0C0', // Expected 3 bytes, truncated
+  '61FF61', // Too many bytes for FF
+  '61AC', // AC is continuation, unexpected at start
+  'EF61', // EF truncated, should be two bytes
+  'E2E282AC', // First E2 truncated, should be three bytes before second E2
+  'F8', // Too many bytes requested
+  'FF', // Too many bytes requested
+  'C080', // Should have been 0x00
+  'E08080', // Should have been 0x00
+  'F080A080', // Should have been 0x00
+  'E08280', // Should have been 0xc280
+  'EDA080', // Surrogate
+  'EDBE80', // Surrogate
+  'EDA080EDB080', // Surrogate pair
+  'BF', // Last continuation byte
+  '80BF', // Two continuation bytes
+  'C020', // Truncated
+  'C0AF', // Overlong
+  'E080AF', // Overlong
+  'F08080AF', // Overlong
+  'F8808080AF', // Overlong
+  'FC80808080AF', // Overlong
+  'C1BF', // Overlong
 ];
 
 function test(TD) {
