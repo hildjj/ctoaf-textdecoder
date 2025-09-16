@@ -4,7 +4,7 @@
   "description": "Quick wrapper that finds TextDecoder in your runtime, or uses an adequate polyfill",
   "main": "index.js",
   "scripts": {
-    "test": "node test.js",
+    "test": "c8 node test.js",
     "test:all": "c8 nve -p 5,6,8,10,12,14,16,18,20,22,24 node test.js",
     "lint": "eslint ."
   },

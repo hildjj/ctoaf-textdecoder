@@ -18,3 +18,4 @@ const TextDecoder = require('@cto.af/textdecoder')
 See [MDN](https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder)
 
 [![Tests](https://github.com/hildjj/ctoaf-textdecoder/actions/workflows/node.js.yml/badge.svg)](https://github.com/hildjj/ctoaf-textdecoder/actions/workflows/node.js.yml)
+[![codecov](https://codecov.io/gh/hildjj/ctoaf-textdecoder/graph/badge.svg?token=JRWVG7UFKQ)](https://codecov.io/gh/hildjj/ctoaf-textdecoder)
