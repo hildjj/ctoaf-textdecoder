@@ -1,5 +1,16 @@
 'use strict';
 
+/**
+ * @typedef {object} State
+ * @prop {number} cur
+ * @prop {number} left
+ * @prop {number} total
+ */
+
+/**
+ * @typedef {TypeError & {code?: string, errno?: number}} ExtendedTypeError
+ */
+
 const REPLACEMENT = '\ufffd';
 const BYTES = [
   // 0b00_000 - 0b01_111: ASCII
@@ -50,6 +61,10 @@ const BYTES = [
 const ERR_MSG = '[ERR_ENCODING_INVALID_ENCODED_DATA]: ' +
 'The encoded data was not valid for encoding utf-8';
 
+/**
+ * @param {State} state
+ * @returns
+ */
 function badLength(state) {
   if (state.cur < 0x80) {
     return true;
@@ -66,17 +81,27 @@ function badLength(state) {
   return false;
 }
 
+/**
+ * @param {State} state
+ * @returns
+ */
 function surrogate(state) {
   return (state.cur >= 0xd800) && (state.cur <= 0xdfff);
 }
 
+/**
+ * @param {Uint8Array} buf
+ * @param {boolean} fatal
+ * @param {State} [state]
+ * @returns {[string, State]}
+ */
 function utf8Decode(buf, fatal, state) {
   if (!state) {
     state = {cur: 0, left: 0, total: 0};
   }
   let res = '';
   for (const b of buf) {
-    const bytes = BYTES[b >> 3];
+    const bytes = /** @type {number} */(BYTES[b >> 3]);
     switch (bytes) {
       case -2:
         // Top 5 bits all set
@@ -84,6 +109,7 @@ function utf8Decode(buf, fatal, state) {
         state.left = 0;
         state.total = 0;
         if (fatal) {
+          /** @type {ExtendedTypeError} */
           const err = new TypeError(ERR_MSG);
           err.code = 'ERR_ENCODING_INVALID_ENCODED_DATA';
           err.errno = 12;
@@ -100,6 +126,7 @@ function utf8Decode(buf, fatal, state) {
           state.left = 0;
           state.total = 0;
           if (fatal) {
+            /** @type {ExtendedTypeError} */
             const err = new TypeError(ERR_MSG);
             err.code = 'ERR_ENCODING_INVALID_ENCODED_DATA';
             err.errno = 12;
@@ -112,6 +139,7 @@ function utf8Decode(buf, fatal, state) {
           if (state.left === 0) {
             if (badLength(state) || surrogate(state)) {
               if (fatal) {
+                /** @type {ExtendedTypeError} */
                 const err = new TypeError(ERR_MSG);
                 err.errno = 12;
                 err.code = 'ERR_ENCODING_INVALID_ENCODED_DATA';
@@ -133,6 +161,7 @@ function utf8Decode(buf, fatal, state) {
           state.left = 0;
           state.total = 0;
           if (fatal) {
+            /** @type {ExtendedTypeError} */
             const err = new TypeError(ERR_MSG);
             err.code = 'ERR_ENCODING_INVALID_ENCODED_DATA';
             err.errno = 12;
@@ -150,6 +179,7 @@ function utf8Decode(buf, fatal, state) {
           state.left = 0;
           state.total = 0;
           if (fatal) {
+            /** @type {ExtendedTypeError} */
             const err = new TypeError(ERR_MSG);
             err.code = 'ERR_ENCODING_INVALID_ENCODED_DATA';
             err.errno = 12;
@@ -167,10 +197,27 @@ function utf8Decode(buf, fatal, state) {
   return [res, state];
 }
 
+/**
+ * @typedef {object} TextDecoderOptions
+ * @prop {boolean} [fatal]
+ * @prop {boolean} [ignoreBOM]
+ */
+
+/**
+ * @typedef {object} StreamOptions
+ * @prop {boolean} [stream]
+ */
+
 class TextDecoderPolyfill {
+  /**
+   *
+   * @param {string} [utfLabel]
+   * @param {TextDecoderOptions} [options]
+   */
   constructor(utfLabel, options) {
     this.encoding = (utfLabel || 'utf-8').toLowerCase();
     if ((this.encoding !== 'utf-8') && (this.encoding !== 'utf8')) {
+      /** @type {RangeError & {code?: string}} */
       const err = new RangeError('The "' + utfLabel + '" encoding is not supported');
       err.code = 'ERR_ENCODING_NOT_SUPPORTED';
       throw err;
@@ -186,6 +233,12 @@ class TextDecoderPolyfill {
     });
   }
 
+  /**
+   *
+   * @param {ArrayBuffer|DataView|Uint8Array} input
+   * @param {StreamOptions} options
+   * @returns
+   */
   decode(input, options) {
     if (!(input instanceof Uint8Array)) {
       if (input instanceof ArrayBuffer) {
@@ -198,6 +251,8 @@ class TextDecoderPolyfill {
         );
       } else {
         const typ = typeof input;
+
+        /** @type {ExtendedTypeError} */
         const err = new TypeError('The "input" argument must be an instance of ArrayBuffer or ArrayBufferView. Received type ' + typ);
         err.code = 'ERR_INVALID_ARG_TYPE';
         throw err;
@@ -209,10 +264,11 @@ class TextDecoderPolyfill {
     if (options && options.stream) {
       this.state = state;
     } else {
-      this.state = null;
+      this.state = undefined;
       if (state.left !== 0) {
         // Truncated
         if (this.fatal) {
+          /** @type {ExtendedTypeError} */
           const err = new TypeError(ERR_MSG);
           err.code = 'ERR_ENCODING_INVALID_ENCODED_DATA';
           err.errno = 11;
