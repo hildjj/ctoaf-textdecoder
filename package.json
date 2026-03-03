@@ -15,7 +15,10 @@
     "types": "tsc",
     "ci": "npm run types && npm run lint && npm run test:all"
   },
-  "repository": "hildjj/ctoaf-textdecoder",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hildjj/ctoaf-textdecoder.git"
+  },
   "keywords": [
     "TextDecoder",
     "utf8",
