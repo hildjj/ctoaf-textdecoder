@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const TxtD = require('./');
+const TxtD = require('./index');
 const Polyfill = require('./polyfill.js');
 
 const invalid = [
@@ -30,12 +30,17 @@ const invalid = [
   'C1BF', // Overlong
 ];
 
+/**
+ *
+ * @param {typeof TextDecoder} TD
+ */
 function test(TD) {
   assert.throws(() => new TD('foo'));
 
   const td = new TD('utf8', {fatal: true, ignoreBOM: true});
   assert.equal(td.decode(Buffer.from('E282AC', 'hex')), '€');
   assert.equal(td.decode(Buffer.from('EFBBBFE282AC', 'hex')), '\ufeff€');
+  // @ts-expect-error Intentional mis-type to check error
   assert.throws(() => td.decode('foo'));
   for (const inv of invalid) {
     assert.throws(() => td.decode(Buffer.from(inv, 'hex')), inv);

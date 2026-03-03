@@ -1,11 +1,18 @@
 'use strict';
 
+/**
+ *
+ * @param {string} t
+ * @param {string} v
+ * @returns {string}
+ */
 function add(t, v) {
   return t + v;
 }
 
-const hasICU = (typeof Intl === 'object');
+/** @type {typeof TextDecoder | null} */
 let TD = null;
+const hasICU = (typeof Intl === 'object');
 
 // Don't use built-in TextDecoder if in a node version without ICU support,
 // since the whole reason we're doing this is to allow `fatal: true`.
@@ -49,4 +56,4 @@ if (typeof TD !== 'function') {
   TD = require('./polyfill.js');
 }
 
-module.exports = TD;
+module.exports = /** @type {typeof TextDecoder} */ (TD);

@@ -1,11 +1,12 @@
+import {defineConfig} from 'eslint/config';
 import ignores from '@cto.af/eslint-config/ignores.js';
 import js from '@cto.af/eslint-config/js.js';
 import mjs from '@cto.af/eslint-config/mjs.js';
 
-export default [
-  ...ignores,
-  ...js,
-  ...mjs,
+export default defineConfig(
+  ignores,
+  js,
+  mjs,
   {
     files: [
       '*.js',
@@ -25,5 +26,5 @@ export default [
     rules: {
       'n/no-unsupported-features/es-syntax': 'off',
     },
-  },
-];
+  }
+);
