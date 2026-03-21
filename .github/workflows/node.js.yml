@@ -10,4 +10,5 @@ jobs:
     with:
       nve: true
       script: ci
+      versions: '[24]'
     secrets: inherit
