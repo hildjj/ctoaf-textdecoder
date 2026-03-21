@@ -13,7 +13,8 @@
     "test:all": "c8 nve -p 5,6,8,10,12,14,16,18,20,22,24,25 node test.js",
     "lint": "eslint .",
     "types": "tsc",
-    "ci": "npm run types && npm run lint && npm run test:all"
+    "ci": "npm run types && npm run lint && npm run test:all",
+    "ci:publish": "npm run types && npm run lint && npm run test"
   },
   "repository": {
     "type": "git",
@@ -29,16 +30,16 @@
   "license": "MIT",
   "devDependencies": {
     "@cto.af/eslint-config": "^6.2.5",
-    "@types/node": "^25.3.3",
-    "eslint": "^10.0.2",
+    "@types/node": "^25.5.0",
+    "eslint": "^10.1.0",
     "eslint-plugin-ava": "^16.0.0",
-    "eslint-plugin-jsdoc": "^62.7.1",
+    "eslint-plugin-jsdoc": "^62.8.0",
     "eslint-plugin-node": "^11.1.0",
     "nve": "18.0.3",
-    "superc8": "^12.2.4",
+    "superc8": "^12.3.1",
     "typescript": "^5.9.3"
   },
-  "packageManager": "pnpm@10.30.3",
+  "packageManager": "pnpm@10.32.1",
   "engines": {
     "node": ">=5.10.0"
   }
