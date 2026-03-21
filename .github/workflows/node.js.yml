@@ -11,4 +11,5 @@ jobs:
       nve: true
       script: ci
       versions: '[24]'
-    secrets: inherit
+    secrets:
+      CODECOV_TOKEN: secrets.CODECOV_TOKEN
