@@ -10,7 +10,7 @@
   "types": "types/index.d.ts",
   "scripts": {
     "test": "c8 node test.js",
-    "test:all": "c8 nve -p 5,6,8,10,12,14,16,18,20,22,24,25 node test.js",
+    "test:all": "c8 nve -p 5,6,8,10,12,14,16,18,20,22,24,26 node test.js",
     "lint": "eslint .",
     "types": "tsc",
     "ci": "npm run types && npm run lint && npm run test:all",
@@ -29,17 +29,17 @@
   "author": "Joe Hildebrand <joe-github@cursive.net>",
   "license": "MIT",
   "devDependencies": {
-    "@cto.af/eslint-config": "^6.2.5",
-    "@types/node": "^25.5.0",
-    "eslint": "^10.1.0",
-    "eslint-plugin-ava": "^16.0.0",
-    "eslint-plugin-jsdoc": "^62.8.0",
+    "@cto.af/eslint-config": "^7.0.3",
+    "@types/node": "^26.6.5",
+    "eslint": "^10.13.0",
+    "eslint-plugin-ava": "^18.0.0",
+    "eslint-plugin-jsdoc": "^65.3.12",
     "eslint-plugin-node": "^11.1.0",
     "nve": "18.0.3",
-    "superc8": "^12.3.1",
-    "typescript": "^5.9.3"
+    "superc8": "^12.7.0",
+    "typescript": "^7.0.2"
   },
-  "packageManager": "pnpm@10.32.1",
+  "packageManager": "pnpm@12.14.0",
   "engines": {
     "node": ">=5.10.0"
   }
